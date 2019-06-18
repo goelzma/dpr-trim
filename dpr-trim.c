@@ -241,7 +241,7 @@ void printCore (struct solver *S) {
 void printProof (struct solver *S) {
   int step;
   printf ("\rc %i of %i lemmas in core using %lu resolution steps\n", S->nActive - S->COREcount + 1, S->nLemmas + 1, S->nResolve);
-  printf ("\rc %d RAT lemmas in core; %i redundant literals in core lemmas\n", S->RATcount, S->nRemoved);
+  printf ("\rc %d PR lemmas in core; %i redundant literals in core lemmas\n", S->RATcount, S->nRemoved);
 
   // NB: not yet working with forward checking
   if (S->mode == FORWARD_UNSAT) {
