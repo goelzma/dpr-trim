@@ -432,7 +432,8 @@ int checkPR (struct solver *S, int *witness) {
             w++; } }
         if (satisfied == 0 && reduced > 0) {
           if ((S->mode == BACKWARD_UNSAT) && !active) {
-            printf ("\rc PR check ignores unmarked clause : "); printClause (S->DB + (S->wlist[i][j] >> 1));
+            if (S->verb) {
+              printf ("\rc PR check ignores unmarked clause : "); printClause (S->DB + (S->wlist[i][j] >> 1)); }
             continue; }
 	  if (nPR == S->maxRAT) {
 	    S->maxRAT = (S->maxRAT * 3) >> 1;
@@ -502,7 +503,8 @@ int checkRAT (struct solver *S, int pivot) {
 	while (*watched)
           if (*watched++ == -pivot) {
             if ((S->mode == BACKWARD_UNSAT) && !active) {
-              printf ("\rc RAT check ignores unmarked clause : "); printClause (S->DB + (S->wlist[i][j] >> 1));
+              if (S->verb) {
+                printf ("\rc RAT check ignores unmarked clause : "); printClause (S->DB + (S->wlist[i][j] >> 1)); }
               continue; }
 	    if (nRAT == S->maxRAT) {
 	      S->maxRAT = (S->maxRAT * 3) >> 1;
@@ -595,13 +597,14 @@ int redundancyCheck (struct solver *S, int *clause, int size) {
 
   if (falsePivot) return FAILED;
 
+/*
   if (clause[WITNESS] != -1) {
     int w = clause[WITNESS];
     printf("c witness : ");
     while (S->witness[w] != 0) {
       printf("%i ", S->witness[w++]); }
     printf("0\n"); }
-
+*/
   int* savedForced = S->forced;
 
   S->RATmode = 1;
@@ -1041,7 +1044,7 @@ int parse (struct solver* S) {
           S->witnessAlloc = (S->witnessAlloc * 3) >> 1;
           S->witness = (int *) realloc (S->witness, sizeof(int) * S->witnessAlloc); }
         S->witness[S->witnessSize++] = 0;
-        printClause (S->witness + wStart);
+        // printClause (S->witness + wStart);
         size = newSize; }
 
       if (size > S->maxSize) S->maxSize = size;
