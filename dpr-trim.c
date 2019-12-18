@@ -268,9 +268,11 @@ void printProof (struct solver *S) {
     for (step = 0; step < S->nStep; step++) {
       long ad = S->proof[step];
       int *lemmas = S->DB + (ad >> INFOBITS);
-      if (!lemmas[1] && (ad & 1)) continue; // don't delete unit clauses
+
+     if (!lemmas[1] && (ad & 1)) continue; // don't delete unit clauses
       if (ad & 1) fprintf (lemmaFile, "d ");
       int reslit = lemmas[PIVOT];
+//      fprintf (lemmaFile, "(%i) ", reslit);
       while (*lemmas) {
         int lit = *lemmas++;
         if (lit == reslit)
@@ -280,6 +282,12 @@ void printProof (struct solver *S) {
         int lit = *lemmas++;
         if (lit != reslit)
           fprintf (lemmaFile, "%i ", lit); }
+      lemmas = S->DB + (ad >> INFOBITS);
+      if (lemmas[WITNESS] != -1 && !(ad & 1)) {
+        lemmas = S->witness + lemmas[WITNESS];
+        while (*lemmas) {
+          int lit = *lemmas++;
+          fprintf (lemmaFile, "%i ", lit); } }
       fprintf (lemmaFile, "0\n"); }
     fprintf (lemmaFile, "0\n");
     fclose (lemmaFile); }
@@ -585,6 +593,7 @@ int redundancyCheck (struct solver *S, int *clause, int size) {
       S->prep = 1; if (S->verb) printf ("\rc [%li] preprocessing checking mode on\n", S->time); }
     if (indegree  > 2 && S->prep == 1) {
       S->prep = 0; if (S->verb) printf ("\rc [%li] preprocessing checking mode off\n", S->time); }
+    clause[WITNESS] = -1;
     if (S->verb) printf ("\rc lemma has RUP\n");
     printDependencies (S, clause, 0);
     return SUCCEED; }
