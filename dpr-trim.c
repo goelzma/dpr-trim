@@ -362,12 +362,18 @@ void printDependenciesFile (struct solver *S, int* clause, int RATflag, int mode
       fprintf (file, "%lu ", S->time >> 1);
       int reslit = clause[PIVOT];
       fprintf (file, "%i ", reslit);
+      int witness = clause[WITNESS];
       while (*clause) sortClause[size++] = *clause++;
       qsort (sortClause, size, sizeof (int), abscompare);
       for (i = 0; i < size; i++) {
         int lit = sortClause[i];
         if (lit != reslit)
-          fprintf (file, "%i ", lit); } }
+          fprintf (file, "%i ", lit); }
+      if (witness != -1) {
+        int *omega = S->witness + witness;
+        while (*omega) {
+          int lit = *omega++;
+          fprintf (file, "%i ", lit); } } }
     else {
       fprintf (file, "%u ", S->count - 1); }
     fprintf (file, "0 ");
