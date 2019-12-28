@@ -424,7 +424,14 @@ void printDependencies (struct solver *S, int* clause, int RATflag) {
 int checkPR (struct solver *S, int *witness) {
   int i, j, nPR = 0;
 
-  // remove from omega all literals in alpha?
+  // remove from omega all literals in alpha+?
+  int *wit  = witness;
+  int *rwit = witness;
+  while (*wit) {
+    if (S->false[-(*wit)]) { if (S->verb) printf ("c removing overlap %i\n", *wit); }
+    else { *rwit = *wit; rwit++; }
+    wit++; }
+  *rwit = 0;
 
   // Loop over all literals to calculate the clauses which are reduced but not satisfied by omega
   for (i = -S->maxVar; i <= S->maxVar; i++) {
