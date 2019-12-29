@@ -272,7 +272,6 @@ void printProof (struct solver *S) {
      if (!lemmas[1] && (ad & 1)) continue; // don't delete unit clauses
       if (ad & 1) fprintf (lemmaFile, "d ");
       int reslit = lemmas[PIVOT];
-//      fprintf (lemmaFile, "(%i) ", reslit);
       while (*lemmas) {
         int lit = *lemmas++;
         if (lit == reslit)
@@ -361,7 +360,12 @@ void printDependenciesFile (struct solver *S, int* clause, int RATflag, int mode
       int sortClause[S->maxSize];
       fprintf (file, "%lu ", S->time >> 1);
       int reslit = clause[PIVOT];
-      fprintf (file, "%i ", reslit);
+      int* tmpc = clause;
+      while (*tmpc) {
+        int lit = *tmpc++;
+        if (lit == reslit)
+        fprintf (file, "%i ", lit); }
+//      fprintf (file, "%i ", reslit);
       int witness = clause[WITNESS];
       while (*clause) sortClause[size++] = *clause++;
       qsort (sortClause, size, sizeof (int), abscompare);
