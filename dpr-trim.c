@@ -146,7 +146,7 @@ void analyze (struct solver* S, int* clause, int index) {     // Mark all clause
         markClause (S, S->DB + S->reason[abs (lit)], -1);
         if (S->assigned >= S->forced)
           S->reason[abs (lit)] = 0; } }
-    else if (S->false[lit] == ASSUMED && !S->RATmode) { // Remove unused literal
+    else if (S->false[lit] == ASSUMED && !S->RATmode && !S->lratFile) { // Remove unused literal
       S->nRemoved++;
       int *tmp = S->current;
       while (*tmp != lit) tmp++;
