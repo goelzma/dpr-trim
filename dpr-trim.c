@@ -146,7 +146,7 @@ void analyze (struct solver* S, int* clause, int index) {     // Mark all clause
         markClause (S, S->DB + S->reason[abs (lit)], -1);
         if (S->assigned >= S->forced)
           S->reason[abs (lit)] = 0; } }
-    else if (S->false[lit] == ASSUMED && !S->RATmode && !S->lratFile) { // Remove unused literal
+    else if (S->false[lit] == ASSUMED && !S->RATmode && !S->lratFile && !S->lemmaStr) { // Remove unused literal
       S->nRemoved++;
       int *tmp = S->current;
       while (*tmp != lit) tmp++;
@@ -365,7 +365,6 @@ void printDependenciesFile (struct solver *S, int* clause, int RATflag, int mode
         int lit = *tmpc++;
         if (lit == reslit)
         fprintf (file, "%i ", lit); }
-//      fprintf (file, "%i ", reslit);
       int witness = clause[WITNESS];
       while (*clause) sortClause[size++] = *clause++;
       qsort (sortClause, size, sizeof (int), abscompare);
