@@ -1,6 +1,6 @@
 /************************************************************************************[dpr-trim.c]
 Copyright (c) 2015-2021 Marijn Heule, Carnegie Mellon University
-Last edit: April 14, 2021
+Last edit: April 16, 2021
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -340,11 +340,20 @@ void printProof (struct solver *S) {
           if (S->binOutput) write_lit (S, lemmaFile, lit);
           else fprintf (lemmaFile, "%i ", lit); } }
       lemmas = S->DB + (ad >> INFOBITS);
+      int witness = lemmas[WITNESS];
       while (*lemmas) {
         int lit = *lemmas++;
         if (lit != reslit) {
           if (S->binOutput) write_lit (S, lemmaFile, lit);
           else fprintf (lemmaFile, "%i ", lit); } }
+
+      if (witness != -1) {
+        int *omega = S->witness + witness;
+        while (*omega) {
+          int lit = *omega++;
+          if (S->binOutput) write_lit (S, lemmaFile, lit);
+          else fprintf (lemmaFile, "%i ", lit); } }
+
       if (S->binOutput) write_lit (S, lemmaFile, 0);
       else fprintf (lemmaFile, "0\n"); }
     if (S->binOutput) { fputc ('a', lemmaFile); write_lit (S, lemmaFile, 0); }
