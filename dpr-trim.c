@@ -578,27 +578,35 @@ int checkPR (struct solver *S, int *witness, int mark) {
             if (*w == -lit) reduced++;
             w++; } }
         if (satisfied == 0 && reduced > 0) {
-          if ((S->mode == BACKWARD_UNSAT) && !active) {
-            printf ("\rc PR check ignores unmarked clause %i\n", id);
-            if (S->verb) {
-              printf ("\rc PR check ignores unmarked clause : "); printClause (S->DB + (S->wlist[i][j] >> 1)); }
-            continue; }
+//          if ((S->mode == BACKWARD_UNSAT) && !active) {
+//            printf ("\rc PR check ignores unmarked clause %i\n", id);
+//            if (S->verb) {
+//              printf ("\rc PR check ignores unmarked clause : "); printClause (S->DB + (S->wlist[i][j] >> 1)); }
+//            continue; }
           if (nPR == S->maxRAT) {
             S->maxRAT = (S->maxRAT * 3) >> 1;
             S->RATset = realloc (S->RATset, sizeof (int) * S->maxRAT); }
           S->RATset[nPR++] = S->wlist[i][j] >> 1; } } } }
 
   // Check all clauses in RATset for RUP
-  int flag = 1;
+  int skipped, flag = 1;
   qsort (S->RATset, nPR, sizeof (int), compare);
   S->nDependencies = 0;
+  skipped = 0;
   for (i = nPR - 1; i >= 0; i--) {
     int* PRcls = S->DB + S->RATset[i];
+    if (S->mode == BACKWARD_UNSAT && (PRcls[ID] & ACTIVE) == 0) {
+      skipped = 1;
+      if (S->verb) {
+        printf ("\rc PR check ignores unmarked clause : "); printClause (PRcls); }
+      continue; }
+
     if (S->verb) {
       printf ("\rc PR clause: "); printClause (PRcls); }
 
     int blocked = 0;
     long int reason  = 0;
+    int id = PRcls[ID] >> 1;
     while (*PRcls) {
       int lit = *PRcls++;
         int wflag = 0;
@@ -627,7 +635,6 @@ int checkPR (struct solver *S, int *witness, int mark) {
           assign (S, -lit); S->reason[abs (lit)] = 0; } }
       if (propagate (S, 0, mark) == SAT) { flag  = 0; break; } }
 
-    int id = PRcls[ID] >> 1;
     addDependency (S, -id, 1); }
 
   if (flag == 0) {

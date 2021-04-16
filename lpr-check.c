@@ -270,11 +270,11 @@ int main (int argc, char** argv) {
         addClause (index, list + 2, length); }
       else {
         printf("c failed to check clause: "); printClause (list + 2);
-        printf("c NOT VERIFIED\n");
+        printf("s NOT VERIFIED\n");
         exit (0); }
 
       if (length == 0) {
-        printf ("c VERIFIED\n");
+        printf ("s VERIFIED\n");
         exit (1); }
     }
     else {
