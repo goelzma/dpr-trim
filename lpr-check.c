@@ -65,7 +65,7 @@ int checkRedundancy (int pivot, int start, int *hints, long long thisMask, long 
       if (clsList[start++] != DELETED) {
         int *clause = table + clsList[start-1];
         if (checkWitness (clause, wMask) == REDUCED) { printf ("c ERROR: hint %i is missing\n", start-1); return FAILED; } } }
-    if (clsList[res] == DELETED) { printf ("c ERROR: using DELETED clause\n"); exit (2); }
+    if (clsList[res] == DELETED) { printf ("c ERROR: using DELETED clause %i\n", res); exit (2); }
 
     if (checkWitness (table + clsList[start], wMask) != REDUCED) {
       printf ("c ERROR: hint is not reduced by witness\n"); return FAILED; }
@@ -82,7 +82,7 @@ int checkRedundancy (int pivot, int start, int *hints, long long thisMask, long 
   // extend the current assignment with the unit clauses in the hints
   while (*hints > 0) {
     int hint = *(hints++);
-    if (clsList[hint] == DELETED) { printf ("c ERROR: using DELETED clause\n"); exit (2); };
+    if (clsList[hint] == DELETED) { printf ("c ERROR: using DELETED clause %i\n", hint); exit (2); };
     int unit = 0, *clause = table + clsList[hint];
     while (*clause) {
       int clit = convertLit (*(clause++));
@@ -180,7 +180,15 @@ int parseLine (FILE* file, int *list, int mode) {
   if (mode == CNF) {
     while (1) {
       tmp = fscanf (file, " %i ", &lit);
-      if (tmp == 0 || tmp == EOF) return 0;
+      if (tmp == EOF) return 0;
+      if (tmp == 0  ) {
+        int i; char ignore[1<<16];
+        if (fgets (ignore, sizeof (ignore), file) == NULL) printf ("c\n");
+        if (ignore[0] != 'c') { printf ("c parsing error: %s\n", ignore); exit (255); }
+        for (i = 0; i < sizeof ignore; i++) { if (ignore[i] == '\n') break; }
+        if (i == sizeof ignore) {
+          printf ("c ERROR: comment longer than %zu characters: %s\n", sizeof ignore, ignore); }
+        return parseLine (file, list, mode); }
       list[count++] = lit;
       if (lit == 0) return count; } }
 
@@ -234,6 +242,7 @@ int main (int argc, char** argv) {
   while (1) {
     int size = parseLine (cnf, list, CNF);
     if (size == 0) break;
+    if (index > nCls) { printf ("c too many clauses in formula\n"), exit (255); }
     addClause (index++, list, size); }
   fclose (cnf);
 
