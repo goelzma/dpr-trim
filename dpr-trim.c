@@ -587,25 +587,27 @@ int checkPR (struct solver *S, int *witness, int mark) {
             if (*w == -lit) reduced++;
             w++; } }
         if (satisfied == 0 && reduced > 0) {
-//          if ((S->mode == BACKWARD_UNSAT) && !active) {
-//            printf ("\rc PR check ignores unmarked clause %i\n", id);
-//            if (S->verb) {
-//              printf ("\rc PR check ignores unmarked clause : "); printClause (S->DB + (S->wlist[i][j] >> 1)); }
-//            continue; }
           if (nPR == S->maxRAT) {
             S->maxRAT = (S->maxRAT * 3) >> 1;
             S->RATset = realloc (S->RATset, sizeof (int) * S->maxRAT); }
           S->RATset[nPR++] = S->wlist[i][j] >> 1; } } } }
 
   // Check all clauses in RATset for RUP
-  int skipped, flag = 1;
   qsort (S->RATset, nPR, sizeof (int), compare);
+
+int flag = 1;
+int pActive;
+do {
+  pActive = 0;
   S->nDependencies = 0;
-  skipped = 0;
+
+  for (i = nPR - 1; i >= 0; i--) {
+    int* PRcls = S->DB + S->RATset[i];
+    if (PRcls[ID] & ACTIVE) pActive++; }
+
   for (i = nPR - 1; i >= 0; i--) {
     int* PRcls = S->DB + S->RATset[i];
     if (S->mode == BACKWARD_UNSAT && (PRcls[ID] & ACTIVE) == 0) {
-      skipped = 1;
       if (S->verb) {
         printf ("\rc PR check ignores unmarked clause : "); printClause (PRcls); }
       continue; }
@@ -627,9 +629,10 @@ int checkPR (struct solver *S, int *witness, int mark) {
         if (!blocked || reason > S->reason[abs (lit)])
           blocked = lit, reason = S->reason[abs (lit)]; }
 
+    // what is this doing?
     if (blocked && reason) {
-      analyze (S, S->DB + reason, -1);
-      S->reason[abs (blocked)] = 0; }
+      analyze (S, S->DB + reason, -1); }
+//      S->reason[abs (blocked)] = 0; }
 
     if (!blocked) {
       PRcls = S->DB + S->RATset[i];
@@ -645,6 +648,16 @@ int checkPR (struct solver *S, int *witness, int mark) {
       if (propagate (S, 0, mark) == SAT) { flag  = 0; break; } }
 
     addDependency (S, -id, 1); }
+
+
+  for (i = nPR - 1; i >= 0; i--) {
+    int* PRcls = S->DB + S->RATset[i];
+    if (PRcls[ID] & ACTIVE) pActive--; }
+
+//  if (pActive < 0) printf ("c UNEXPECTED %i %i\n", pActive, S->time);
+  }
+//  while (0 && flag);
+  while (pActive < 0 && flag);
 
   if (flag == 0) {
     while (S->forced < S->assigned) S->falseA[*(--S->assigned)] = 0;

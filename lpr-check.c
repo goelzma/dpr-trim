@@ -48,6 +48,9 @@ int convertLit (int lit)   { return (abs(lit) * 2) + (lit < 0); }
 void printClause (int* clause) {
   while (*clause) printf ("%i ", *clause++); printf ("0\n"); }
 
+void printHints (int* hints) {
+  while (*hints > 0) printf ("%i ", *hints++); printf ("0\n"); }
+
 int checkWitness (int *clause, int mask) {
   int res = SATISFIED;
   while (*clause) {
@@ -59,7 +62,7 @@ int checkWitness (int *clause, int mask) {
 int checkRedundancy (int pivot, int start, int *hints, long long thisMask, long long wMask) {
   int res = abs(*hints++);
 
-  if (res != 0) { // skip the below for the initial hints (to extend alpha)
+  if (res != 0) { // skip below for the initial hints (to extend alpha)
     // check whether res is the first clause after start that is reduced and not satisfied by the witness
     while (start < res) {
       if (clsList[start++] != DELETED) {
@@ -94,6 +97,7 @@ int checkRedundancy (int pivot, int start, int *hints, long long thisMask, long 
     alpha[unit^1] = thisMask; } // hint is unit: assign to alpha
 
   if (res == 0) return UNKNOWN;
+  printf ("c ERROR: reached end of hint %i without conflict\n", res);
   return FAILED; }
 
 int checkClause (int* list, int size, int* hints) {
@@ -116,7 +120,9 @@ int checkClause (int* list, int size, int* hints) {
   int res = checkRedundancy (pivot, 0, hints, finalMask, finalMask);
   //printf("%i\n", res);
 
-  if (res  == FAILED) return FAILED;
+  if (res  == FAILED) {
+    printf ("c ERROR: failed while checking hint %i\n", res);
+    return FAILED; }
   if (res  == SUCCESS) return SUCCESS;
   if (nRed == 0) {
     printf ("c ERROR: clause ");
