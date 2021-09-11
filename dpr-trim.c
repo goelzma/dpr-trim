@@ -466,7 +466,7 @@ void printDependenciesFile (struct solver *S, int* clause, int RATflag, int mode
 
     if (clause != NULL) {
            S->lratLookup[clause[ID] >> 1] = S->lratSize; }
-    else { S->lratLookup[S->count] = S->lratSize;   }
+    else { S->lratLookup[S->count] = S->lratSize;        }
 
     if (clause != NULL) {
       int size = 0;
@@ -482,11 +482,11 @@ void printDependenciesFile (struct solver *S, int* clause, int RATflag, int mode
           lratAdd (S, reslit);
         sortClause[size++] = *clause++; }
       qsort (sortClause, size, sizeof (int), abscompare);
-      free (sortClause);
       for (i = 0; i < size; i++) {
         int lit = sortClause[i];
         if (lit != reslit)
           lratAdd (S, lit); }
+      free (sortClause);
 
       // print the witness for PR
       if (witness != -1) {
