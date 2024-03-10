@@ -230,7 +230,7 @@ int main (int argc, char** argv) {
   for (;;) {
     int tmp = fscanf (cnf, " p cnf %i %i ", &nVar, &nCls);
     if (nVar > 0) break;
-    fgets (ignore, sizeof (ignore), cnf);
+    char* c = fgets (ignore, sizeof (ignore), cnf);
     int j; for (j = 0; j < 1024; j++) { if (ignore[j] == '\n') break; }
     if (j == 1024) {
       printf ("c ERROR: comment longer than 1024 characters: %s\n", ignore); exit (0); } }
