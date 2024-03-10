@@ -228,7 +228,7 @@ int main (int argc, char** argv) {
   char ignore[1024];
   FILE* cnf   = fopen (argv[1], "r");
   for (;;) {
-    fscanf (cnf, " p cnf %i %i ", &nVar, &nCls);
+    int tmp = fscanf (cnf, " p cnf %i %i ", &nVar, &nCls);
     if (nVar > 0) break;
     fgets (ignore, sizeof (ignore), cnf);
     int j; for (j = 0; j < 1024; j++) { if (ignore[j] == '\n') break; }
