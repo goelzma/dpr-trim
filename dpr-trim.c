@@ -1,6 +1,6 @@
 /************************************************************************************[dpr-trim.c]
-Copyright (c) 2015-2021 Marijn Heule, Carnegie Mellon University
-Last edit: April 16, 2021
+Copyright (c) 2015-2024 Marijn Heule, Carnegie Mellon University
+Last edit: April 21, 2024
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -1583,7 +1583,7 @@ int main (int argc, char** argv) {
           for (j = 0; j < 10; j++) {
             c = getc_unlocked (S.proofFile);
             if (c == EOF) break;
-            if ((c != 100) && (c != 10) && (c != 13) && (c != 32) && (c != 45) && ((c < 48) || (c > 57)) && (comment && ((c < 65) || (c > 122))))  {
+            if ((c != 100) && (c != 10) && (c != 13) && (c != 32) && (c != 45) && ((c < 48) || (c > 57)) && (!comment || (c < 65) || (c > 122)))  {
               printf ("\rc turning on binary mode checking\n");
               S.binMode = 1; break; } } }
         fclose (S.proofFile);
